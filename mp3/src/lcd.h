@@ -25,3 +25,5 @@ void lcd_draw_rect(spi_device_handle_t spi, uint16_t x, uint16_t y,
 
 void lcd_draw_rect_dma(spi_device_handle_t spi, uint16_t x, uint16_t y,
                        uint16_t width, uint16_t height, const uint8_t *pixels);
+
+void display_char(spi_device_handle_t spi, int x, int y, char character);

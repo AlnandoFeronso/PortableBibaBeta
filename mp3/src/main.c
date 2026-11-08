@@ -14,5 +14,5 @@ void app_main(void)
         pixels[i*2+1] = 0xE0;
     }
 
-    lcd_draw_rect_dma(lcd_spi, 0, 0, LCD_WIDTH_PX, LCD_HEIGHT_PX, pixels);
+    display_char(lcd_spi, 10, 10, 'a');
 }

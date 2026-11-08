@@ -4,6 +4,7 @@
 
 #include "lcd.h"
 #include "spi.h"
+#include "font.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -306,5 +307,23 @@ void lcd_draw_rect_dma(spi_device_handle_t spi, uint16_t x, uint16_t y,
     // Free the allocated pixel buffers
     for (int i = 0; i < 2; i++) {
         free(lines[i]);
+    }
+}
+
+void display_char(spi_device_handle_t spi, int x, int y, char character){
+    lcd_set_window(spi, x, y, x + CHAR_WIDTH - 1, y + CHAR_HEIGHT - 1);
+    char character_data[32] = font[character];
+    
+    for (int y = 0; y < 16; y++){
+        for (int x = 0; x < 8; x++){
+            if ((character_data[2*y] << x) & 0b10000000 == 1){
+                
+            }
+        }
+        for (int x = 0; x < 8; x++){
+            if ((character_data[2*y+1] << x) & 0b10000000 == 1) {
+
+            }
+        }
     }
 }
