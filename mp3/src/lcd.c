@@ -267,7 +267,7 @@ void lcd_draw_rect_dma(spi_device_handle_t spi, uint16_t x, uint16_t y,
 
     // Allocate memory for the pixel buffers
     for (int i = 0; i < 2; i++) {
-        lines[i] = spi_bus_dma_memory_alloc(SPI_HOST_ID, line_buffer_size, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+        lines[i] = spi_bus_dma_memory_alloc(LCD_SPI_HOST, line_buffer_size, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
         assert(lines[i] != NULL);
     }
 
@@ -310,20 +310,37 @@ void lcd_draw_rect_dma(spi_device_handle_t spi, uint16_t x, uint16_t y,
     }
 }
 
-void display_char(spi_device_handle_t spi, int x, int y, char character){
-    lcd_set_window(spi, x, y, x + CHAR_WIDTH - 1, y + CHAR_HEIGHT - 1);
-    char character_data[32] = font[character];
-    
-    for (int y = 0; y < 16; y++){
-        for (int x = 0; x < 8; x++){
-            if ((character_data[2*y] << x) & 0b10000000 == 1){
-                
-            }
-        }
-        for (int x = 0; x < 8; x++){
-            if ((character_data[2*y+1] << x) & 0b10000000 == 1) {
+void lcd_draw_char(spi_device_handle_t spi, uint16_t x, uint16_t y,
+                   char c, uint16_t fg, uint16_t bg)
+{
+    const uint8_t *glyph = font[(uint8_t)c];
 
-            }
+    uint8_t buf[FONT_WIDTH * FONT_HEIGHT * BYTES_PER_PIXEL];
+    uint8_t *p = buf;
+
+    for (int row = 0; row < FONT_HEIGHT; row++){ 
+        uint16_t bits = glyph[2 * row + 1] << 8;
+        bits |= glyph[2 * row];
+
+        for (int col = 0; col < FONT_WIDTH; col++) {
+            uint16_t color = (bits & (1 << (FONT_WIDTH - 1 - col))) ? fg : bg;
+            *p++ = color >> 8;
+            *p++ = color & 0xFF;
         }
+    }
+
+    lcd_set_window(spi, x, y, x + FONT_WIDTH - 1, y + FONT_HEIGHT - 1);
+    lcd_data(spi, buf, sizeof(buf));
+}
+
+void lcd_draw_string(spi_device_handle_t spi, uint16_t x, uint16_t y,
+                     const char *s, uint16_t fg, uint16_t bg)
+{
+    for (; *s != '\0'; s++) {
+        if (x + FONT_WIDTH > LCD_WIDTH_PX) {
+            break;
+        }
+        lcd_draw_char(spi, x, y, *s, fg, bg);
+        x += FONT_WIDTH;
     }
 }
