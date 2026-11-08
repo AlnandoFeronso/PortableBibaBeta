@@ -35,3 +35,7 @@ void lcd_draw_char(spi_device_handle_t spi, uint16_t x, uint16_t y,
 
 void lcd_draw_string(spi_device_handle_t spi, uint16_t x, uint16_t y,
                      const char *s, uint16_t fg, uint16_t bg);
+
+void draw_icon(spi_device_handle_t spi, uint16_t x, uint16_t y,
+               const uint8_t *icon, const int icon_width, const int icon_height,
+               uint16_t fg, uint16_t bg);

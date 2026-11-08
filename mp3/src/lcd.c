@@ -344,3 +344,31 @@ void lcd_draw_string(spi_device_handle_t spi, uint16_t x, uint16_t y,
         x += FONT_WIDTH;
     }
 }
+
+void draw_icon(spi_device_handle_t spi, uint16_t x, uint16_t y,
+               const uint8_t *icon, const int icon_width, const int icon_height,
+               uint16_t fg, uint16_t bg)
+    {
+    int byte_num = icon_width / 8;
+    if (icon_width%8!=0){
+        byte_num++;
+    }
+    
+    uint8_t buf[icon_width * icon_height * BYTES_PER_PIXEL];
+    uint8_t *p = buf;
+
+    for (int row = 0; row < icon_height; row++){ 
+        uint32_t bits = icon[byte_num * row + 2] << 16;
+        bits |= icon[byte_num * row + 1] << 8;
+        bits |= icon[byte_num * row];
+
+        for (int col = 0; col < icon_width; col++) {
+            uint16_t color = (bits & (1 << (icon_width - 1 - col))) ? fg : bg;
+            *p++ = color >> 8;
+            *p++ = color & 0xFF;
+        }
+    }
+
+    lcd_set_window(spi, x, y, x + icon_width - 1, y + icon_height - 1);
+    lcd_data(spi, buf, sizeof(buf));
+}

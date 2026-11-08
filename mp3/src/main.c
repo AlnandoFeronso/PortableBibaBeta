@@ -1,6 +1,7 @@
 #include "lcd.h"
 #include "sd_card.h"
 #include "spi.h"
+#include "ui.h"
 
 void app_main(void)
 {
@@ -15,14 +16,5 @@ void app_main(void)
     spi_bus_init(SD_SPI_HOST, SD_PIN_MOSI, SD_PIN_MISO, SD_PIN_CLK, 4096);
     spi_device_init(SD_SPI_HOST, &sd_spi, SD_INIT_CLOCK_HZ, 0, SD_PIN_CS, 1, NULL);
 
-    static uint8_t pixels[LCD_WIDTH_PX * LCD_HEIGHT_PX * BYTES_PER_PIXEL];
-    for (int i = 0; i < LCD_WIDTH_PX * LCD_HEIGHT_PX; i++) {
-        pixels[i*2] = 0x07;
-        pixels[i*2+1] = 0xE0;
-    }
-
-    lcd_draw_rect_dma(lcd_spi, 0, 0, LCD_WIDTH_PX, LCD_HEIGHT_PX, pixels);
-    
-    lcd_draw_char(lcd_spi, 10, 10, 'a', 0x0000, 0x07E0);
-    lcd_draw_string(lcd_spi, 10, 30, "Hello, MP3!", 0x0000, 0x07E0);
+    draw_ui(lcd_spi);
 }
