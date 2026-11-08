@@ -1,4 +1,7 @@
 #pragma once
+#include "driver/spi_master.h"
+
+#define SPI_HOST_ID SPI2_HOST
 
 void spi_bus_init(int max_transfer_sz);
 
